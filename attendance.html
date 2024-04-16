@@ -1,0 +1,133 @@
+<!-- attendance.html -->
+{% extends 'employee_dashboard.html' %}
+{% block extra_styles %}
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      background-color: #f38ed3;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .session {
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      text-align: center;
+      color:black;
+    }
+    h2 {
+      margin-bottom: 10px;
+      text-align: center;
+      background-color: rgb(233, 221, 230);
+      color:rgb(22,9,71);
+    }
+
+    .session-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .session-buttons button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      background-color:rgb(22,9,71);
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .session-buttons button:hover {
+      background-color: rgb(22,9,71);
+    }
+  </style>
+{% endblock %}
+{% block content %}
+  <div class="container">
+    <h2 id="date"></h2>
+    <div class="session">
+      <h3>Before Noon</h3>
+      <div class="session-buttons">
+        <form id="morningForm" method="post" action="{% url 'record_attendance' %}">
+          {% csrf_token %}
+          <button type="button" name="button_clicked" value="morningClockIn" onclick="submitForm('morningClockIn')">Clock In</button>
+          <button type="button" name="button_clicked" value="morningBreakIn" onclick="submitForm('morningBreakIn')">Break In</button>
+          <button type="button" name="button_clicked" value="morningBreakOut" onclick="submitForm('morningBreakOut')">Break Out</button>
+          <button type="button" name="button_clicked" value="morningClockOut" onclick="submitForm('morningClockOut')">Clock Out</button>
+        </form>
+      </div>
+    </div>
+    <div class="session">
+      <h3>Afternoon</h3>
+      <div class="session-buttons">
+        <form id="afternoonForm" method="post" action="{% url 'record_attendance' %}">
+          {% csrf_token %}
+          <button type="button" name="button_clicked" value="afternoonClockIn" onclick="submitForm('afternoonClockIn')">Clock In</button>
+          <button type="button" name="button_clicked" value="afternoonBreakIn" onclick="submitForm('afternoonBreakIn')">Break In</button>
+          <button type="button" name="button_clicked" value="afternoonBreakOut" onclick="submitForm('afternoonBreakOut')">Break Out</button>
+          <button type="button" name="button_clicked" value="afternoonClockOut" onclick="submitForm('afternoonClockOut')">Clock Out</button>
+        </form>
+      </div>
+      
+    </div>
+    <div id="result"></div> <!-- Container to display the result -->
+  </div>
+
+  <script>
+    // Function to fetch and update current date
+    function updateDate() {
+      var currentDate = new Date();
+      var dateString = currentDate.toDateString();
+      document.getElementById("date").innerText = dateString;
+    }
+
+    // Update date when the page loads
+    document.addEventListener("DOMContentLoaded", function() {
+      updateDate();
+    });
+
+    // Function to handle form submission via AJAX
+    function submitForm(buttonClicked) {
+      var formId;
+      var formData = new FormData();
+
+      // Determine the form ID based on the button clicked
+      if (buttonClicked.startsWith('morning')) {
+        formId = 'morningForm';
+      } else {
+        formId = 'afternoonForm';
+      }
+
+      // Add button_clicked value to form data
+      formData.append('button_clicked', buttonClicked);
+
+      // Perform AJAX request
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', document.getElementById(formId).getAttribute('action'), true);
+      xhr.setRequestHeader('X-CSRFToken', document.getElementsByName('csrfmiddlewaretoken')[0].value);
+
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          if (xhr.status === 200) {
+            // Update result container with the response
+            document.getElementById('result').innerText = JSON.parse(xhr.responseText).button_clicked;
+          } else {
+            // Handle error
+            console.error('AJAX request failed');
+          }
+        }
+      };
+
+      // Send form data
+      xhr.send(formData);
+    }
+  </script>
+{% endblock %}
