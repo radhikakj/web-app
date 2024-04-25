@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Management System</title>
+  <!-- Bootstrap CSS -->
+  {% block extra_styles %}
+  {% endblock %}
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-image: url("{% static 'images/bg.jpg' %}");
+      background-size: cover;
+      background-repeat: no-repeat;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+    .sidebar {
+      height: 100%;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: rgb(22, 9, 71);
+      padding-top: 20px;
+      text-align: center;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .sidebar a {
+      padding: 10px;
+      text-decoration: none;
+      font-size: 18px;
+      color: white;
+      display: block;
+    }
+    .sidebar a:hover {
+      background-color: red;
+    }
+    .content {
+      padding: 20px;
+      margin-left: 250px;
+      background-color: transparent;
+      width: calc(100% - 250px);
+      box-sizing: border-box;
+      z-index: 0;
+    }
+    .logout-btn {
+      text-align: center;
+      bottom: 20px;
+    }
+    .add-employees-link {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin: 20px;
+    }
+    h1 {
+      text-align: center;
+      color: rgb(22, 9, 71);
+    }
+    .employee_details {
+      color: white;
+      line-height: 2.3;
+      background-color:rgb(22,9,71);
+      margin: auto;
+      width: 70%;
+      padding: 20px;
+      padding-left: 50px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+    .card.shadow {
+      width: 150%;
+      border: none;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+      margin-bottom: 20px;
+      padding-left: 50px;
+    }
+    .employee_details table {
+      width: 100%;
+      padding-left: 50px;
+    }
+    .employee_details th,
+    .employee_details td {
+      padding: 12px;
+      text-align: left;
+    }
+    .employee_details th:first-child,
+    .employee_details td:first-child {
+      width: 80%;
+    }
+    .employee_details th:last-child,
+    .employee_details td:last-child {
+      width: 120%;
+    }
+    .employee_details th {
+      background-color: #f2f2f2;
+    }
+  </style>
+  {% block extra_scripts %}
+  <!-- Additional JavaScript specific to this page -->
+  {% endblock %}
+</head>
+<body>
+  <div class="sidebar">
+    <div class="text-center my-4">
+      <img src="{% static 'images/logo.png' %}" alt="Logo" style="max-width: 200px;">
+    </div>
+    <a href="{% url 'profile' %}" class="list-group-item list-group-item-action" style="color:rgb(22, 9, 71);">Profile</a>
+    <a href="{% url 'emp_home' %}" class="list-group-item list-group-item-action" style="color:rgb(22, 9, 71);">Home</a>
+    <a href="{% url 'change_password' %}" class="list-group-item list-group-item-action" style="color: rgb(22, 9, 71);">Change Password</a>
+    <a href="{% url 'attendance' %}" class="list-group-item list-group-item-action" style="color: rgb(22, 9, 71);">Attendance</a>
+    <li class="dropdown">
+      <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                  <p style="display: inline-block;">
+                    Permission
+                      <b class="caret"></b>
+                  </p>
+  
+            </a>
+            <ul class="dropdown-menu">
+              {% if request.user.is_superuser %}
+              <li><a href="{% url 'permissionslist' %}" style="color: black;" >Pending Permissions</a></li>
+              <li><a href="{% url 'cancelpermissionslist' %}" style="color: black;">Approved Permissions</a></li>
+              <li><a href="{% url 'permissionsrejected' %}" style="color: black;">Rejected Permissions</a></li>
+              
+              <li class="divider"></li>
+             
+              {% else %}
+              <li><a href="{% url 'createpermission' %}" style="color: black;">Apply for Permission</a></li>
+              <li class="divider"></li>
+              <li><a href="{% url 'staffpermissiontable' %}" style="color: black;">All Permissions</a></li>
+              {% endif %}
+            </ul>
+      </li>
+    
+      
+      
+    
+      <li class="dropdown">
+        <a href="" class="dropdown-toggle" data-toggle="dropdown">
+                    <p style="display: inline-block;">
+                        Leave
+                        <b class="caret"></b>
+                    </p>
+    
+              </a>
+              <ul class="dropdown-menu">
+                {% if request.user.is_superuser %}
+                <li><a href="{% url 'leaveslist' %}" style="color: black;" >Pending Leaves</a></li>
+                <li><a href="{% url 'approvedleaveslist' %}" style="color: black;">Approved Leaves</a></li>
+                <li><a href="{% url 'canceleaveslist' %}" style="color: black;">Rejected Leaves</a></li>
+                
+                <li class="divider"></li>
+               
+                {% else %}
+                <li><a href="{% url 'createleave' %}" style="color: black;">Apply for Leave</a></li>
+                <li class="divider"></li>
+                <li><a href="{% url 'staffleavetable' %}" style="color: black;">All Leaves</a></li>
+                {% endif %}
+              </ul>
+        </li>
+    
+    <a href="{% url 'login' %}" class="logout-btn list-group-item list-group-item-action" style="color:rgb(22, 9, 71); position: absolute; bottom: 0; right: 0;">Logout</a>
+  </div>
+  
+  <div class="content" id="main-content">
+    <!-- Content goes here -->
+    
+  
+    {% block content %}
+    {% endblock %}
+  </div>
+  <!-- Bootstrap JS -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
