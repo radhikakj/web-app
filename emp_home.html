@@ -1,0 +1,156 @@
+{% extends 'employee_dashboard.html' %}
+
+{% block extra_styles %}
+<style>
+    body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .welcome {
+        margin-bottom: 20px;
+    }
+
+    .clock {
+        position: relative;
+        width: 200px;
+        height: 200px;
+        border: 10px solid #333;
+        border-radius: 50%;
+        margin-bottom: 20px;
+    }
+    
+    .hour,
+    .minute,
+    .second {
+        position: absolute;
+        width: 50%;
+        height: 2px;
+        background-color: #000;
+        top: 50%;
+        transform-origin: 100% 50%;
+    }
+    
+    .hour {
+        background-color: #000;
+        transform: rotate(90deg);
+    }
+    
+    .minute {
+        background-color: #555;
+        transform: rotate(180deg);
+    }
+    
+    .second {
+        background-color: #f00;
+        transform: rotate(270deg);
+    }
+
+    .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .button {
+        margin: 0 10px;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        color: #fff;
+        width: 150px;
+    }
+
+    .clock-in {
+        background-color: green;
+    }
+
+    .clock-out {
+        background-color: red;
+    }
+
+    .start-break {
+        background-color: green;
+    }
+
+    .end-break {
+        background-color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="welcome">
+    <h1>Hi, {{ user_profile.first_name }} {{ user_profile.last_name }}</h1>
+</div>
+<div class="clock-container">
+    <div class="clock">
+        <div class="hour"></div>
+        <div class="minute"></div>
+        <div class="second"></div>
+    </div>
+    <div class="button-container">
+        <button id="clockInOut" class="button clock-in" onclick="toggleClockInOut()">Clock In</button>
+        <button id="startEndBreak" class="button start-break" onclick="toggleStartEndBreak()">Start Break</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    function setClock() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        const hourHand = document.querySelector('.hour');
+        const minuteHand = document.querySelector('.minute');
+        const secondHand = document.querySelector('.second');
+
+        const hourDegrees = (hours % 12) * 30 + (minutes / 60) * 30;
+        const minuteDegrees = (minutes / 60) * 360;
+        const secondDegrees = (seconds / 60) * 360;
+
+
+        hourHand.style.transform = `rotate(${hourDegrees}deg)`;
+        minuteHand.style.transform = `rotate(${minuteDegrees}deg)`;
+        secondHand.style.transform = `rotate(${secondDegrees}deg)`;
+    }
+
+
+    function toggleClockInOut() {
+        const clockInOutButton = document.getElementById('clockInOut');
+        if (clockInOutButton.classList.contains('clock-in')) {
+            clockInOutButton.textContent = 'Clock Out';
+            clockInOutButton.classList.remove('clock-in');
+            clockInOutButton.classList.add('clock-out');
+        } else {
+            clockInOutButton.textContent = 'Clock In';
+            clockInOutButton.classList.remove('clock-out');
+            clockInOutButton.classList.add('clock-in');
+        }
+    }
+
+    function toggleStartEndBreak() {
+        const startEndBreakButton = document.getElementById('startEndBreak');
+        if (startEndBreakButton.classList.contains('start-break')) {
+            startEndBreakButton.textContent = 'End Break';
+            startEndBreakButton.classList.remove('start-break');
+            startEndBreakButton.classList.add('end-break');
+        } else {
+            startEndBreakButton.textContent = 'Start Break';
+            startEndBreakButton.classList.remove('end-break');
+            startEndBreakButton.classList.add('start-break');
+        }
+    }
+
+    setClock();
+    setInterval(setClock, 1000);
+</script>
+{% endblock %}
